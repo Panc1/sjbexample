@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">现金钱柜</string>
+    <string name="title_home">首页</string>
+    <string name="title_my">我的</string>
+    <string name="title_collection">热门贷款</string>
+    <string name="title_topic">今日热门</string>
+    <string name="title_strategy">贷款攻略</string>
+</resources>

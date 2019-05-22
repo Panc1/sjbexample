@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!-- saved from url=(0111)http://oss-channel.yryp6.com/template_1/register1.html?channelCode=c0f5034e8dfc22ee3f8f378f387b4528&inviteCode= -->
+<html data-dpr="1" style="font-size: 64px;">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="https://hm.baidu.com/hm.js?e6101230f4ba35d0df61ad74aa8ce22c"></script><script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "https://hm.baidu.com/hm.js?e6101230f4ba35d0df61ad74aa8ce22c";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+	
+		
+		<meta name="x5-orientation" content="portrait">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,minimum-scale=1.0,maximum-scale=1.0">
+        <title>快速注册</title>
+        <link rel="stylesheet" href="http://oss-channel.yryp6.com/template_1/css/common.css">
+        <link rel="stylesheet" href="http://oss-channel.yryp6.com/template_1/css/register.css">
+        <script src="http://oss-channel.yryp6.com/template_1/js/wr_rem.js"></script><meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+        <script src="http://oss-channel.yryp6.com/template_1/js/fastclick.js"></script>
+        <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+        <script src="http://oss-channel.yryp6.com/template_1/js/register.js"></script>
+	</head>
+
+	<body>
+		<div id="app">
+            <img src="http://oss-channel.yryp6.com/template_1/images/bg1.png" alt="" class="bg">
+            <div class="reg" style="background:rgba(255,255,255,1);padding-top: 0.62rem;height:4.67rem;">
+                <div class="regphone submit">
+                    <input type="text" placeholder="请输入手机号码" class="userPhone">
+                    <img src="http://oss-channel.yryp6.com/template_1/images/inputBg1.png" alt="" class="inputIcon1">
+                </div>
+                <div class="regphone submit">
+                    <input type="text" placeholder="图形验证码" class="captcha">
+                    <img src="http://oss-channel.yryp6.com/template_1/images/inputBg3.png" alt="" class="inputIcon">
+                    <img src="http://reg.yryp6.com/v2/borrowUser/captcha.svl?randomStr=UUx74tXHYd23f8tys9rMXPbeiEr4iDx3TBsS" alt="" class="imgTest" id="captchaImgBtn">
+                </div>
+                <div class="regphone submit">
+                    <input type="text" placeholder="手机验证码" class="smsCode">
+                    <img src="http://oss-channel.yryp6.com/template_1/images/inputBg2.png" alt="" class="inputIcon2">
+                    <span class="getTest">获取验证码</span>
+                </div>
+                <div class="btn">
+                    <img src="http://oss-channel.yryp6.com/template_1/images/btn1.png" alt="" id="imgBtn">
+                </div>
+            </div>
+        </div>
+	
+    <script>
+        let obj = {
+            flag:true  //防止倒计时过程中被点击
+        };
+        var iosUrl = '';
+        var androidUrl = '';
+        var url = '';
+        ChannelRegister.getDownloadUrl(function (data) {
+            if (data.code != '0') {
+                alert(data.message);
+            } else {
+                iosUrl = data.result.iosUrl;
+                androidUrl = data.result.androidUrl;
+            }
+        });
+        var u = navigator.userAgent, app = navigator.appVersion;
+        var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
+        var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+        if (isIOS) {
+            url = iosUrl;
+        } else {
+            var ua = window.navigator.userAgent.toLowerCase();
+            if(ua.match(/MicroMessenger/i) == 'micromessenger'){
+				var downloadUrl = androidUrl.split('//')[1];
+                url = "http://oss-channel.yryp6.com/weixin/index.html?url="+downloadUrl;
+            } else {
+				url = androidUrl;
+			}
+        }
+        $(".getTest").click(() => {
+            if(obj.flag){
+                let userPhone = $('.userPhone').val();
+				let captcha = $('.captcha').val();
+                if(!userPhone){
+                    alert("请输入手机号码");
+                    return;
+                }
+				if(!captcha){
+                    alert("请输入图形验证码");
+                    return;
+                }
+                ChannelRegister.isExist(userPhone, function(data){
+                    if(data.code == '0'){
+                        if(data.result.isRegister == 0){
+                            ChannelRegister.sendSmsCode(userPhone,captcha,function(data){
+                                if(data.code != '0'){
+                                    alert(data.message);
+                                }else{
+                                    ChannelRegister.RemainTime('.getTest',obj)
+                                }
+                            })
+                        }else{
+                            location.href = url
+                        }
+                    }else{
+                        alert(data.message);
+                    }
+                })
+            }
+        })
+        $('#imgBtn').click(() => {
+            var userPhone = $(".userPhone").val();
+            var smsCode = $(".smsCode").val();
+            if (!userPhone) {
+                alert("请输入手机号");
+                return;
+            }
+            if (!smsCode) {
+                alert("请输入短信验证码");
+                return;
+            }
+            ChannelRegister.register(userPhone,smsCode,ChannelRegister.getQueryString("channelCode"),ChannelRegister.getQueryString("inviteCode"), data => {
+                if(data.code == '0'){
+                    location.href = url
+                }else if(data.code == '100'){
+                    // 已注册
+                    location.href = url
+                }else{
+                    alert(data.message);
+                }
+            })
+        })
+    </script>
+</body></html>
